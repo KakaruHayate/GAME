@@ -128,6 +128,7 @@ def infer_model(
         cache_threshold: float | None = None,
         cache_fn_blocks: int = 1,
         cache_warmup_steps: int = 1,
+        cache_taylor_derivatives: int = 0,
 ):
     cache_installed = False
     if cache_threshold is not None and cache_threshold > 0:
@@ -143,12 +144,19 @@ def infer_model(
                 fn_blocks=cache_fn_blocks,
                 threshold=cache_threshold,
                 warmup_steps=cache_warmup_steps,
+                taylor_derivatives=cache_taylor_derivatives,
             ).install_into(model)
             model._dbcache = cacher
             cache_installed = True
+            taylor_tag = (
+                f", taylor_derivatives={cache_taylor_derivatives}"
+                if cache_taylor_derivatives > 0
+                else ""
+            )
             logging.info(
                 f"DBCache enabled: fn_blocks={cache_fn_blocks}, "
-                f"threshold={cache_threshold}, warmup_steps={cache_warmup_steps}",
+                f"threshold={cache_threshold}, warmup_steps={cache_warmup_steps}"
+                f"{taylor_tag}",
                 callback=rank_zero_info,
             )
     try:

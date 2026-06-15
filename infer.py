@@ -216,6 +216,15 @@ def shared_options(func=None, *, defaults: dict[str, Any] = None):
             default=1,
             help="Number of leading (warmup) blocks always executed when DBCache is on."
         ),
+        click.option(
+            "--cache-taylor-derivatives", type=click.IntRange(min=0), show_default=True,
+            default=0,
+            help=(
+                "Order of the TaylorSeer calibrator (>=0). 0 = pure DBCache "
+                "(default); 1 = first-order extrapolation; 2 = adds second-order "
+                "term. Higher values diverge faster on long cache intervals."
+            )
+        ),
     ]
 
     def decorator(f):
@@ -305,6 +314,7 @@ def extract(
         est_threshold: float,
         cache_threshold: float,
         cache_fn_blocks: int,
+        cache_taylor_derivatives: int,
         input_formats: set[str],
         glb: str,
         output_formats: set[str],
@@ -380,6 +390,7 @@ def extract(
         precision=precision,
         cache_threshold=cache_threshold if cache_threshold > 0 else None,
         cache_fn_blocks=cache_fn_blocks,
+        cache_taylor_derivatives=cache_taylor_derivatives,
     )
     logging.success("Inference completed.", callback=rank_zero_info)
 
@@ -559,6 +570,7 @@ def align(
         precision=precision,
         cache_threshold=cache_threshold if cache_threshold > 0 else None,
         cache_fn_blocks=cache_fn_blocks,
+        cache_taylor_derivatives=cache_taylor_derivatives,
     )
     logging.success("Inference completed.", callback=rank_zero_info)
 

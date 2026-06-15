@@ -71,6 +71,10 @@ from lib import logging
     "--cache-fn-blocks", type=click.IntRange(min=1), default=1, show_default=True,
     help="Number of front blocks always executed when DBCache is on."
 )
+@click.option(
+    "--cache-taylor-derivatives", type=click.IntRange(min=0), default=0, show_default=True,
+    help="Order of TaylorSeer calibrator (0 = pure DBCache)."
+)
 def main(
         dataset: pathlib.Path,
         model: pathlib.Path,
@@ -83,6 +87,7 @@ def main(
         precision: str,
         cache_threshold: float,
         cache_fn_blocks: int,
+        cache_taylor_derivatives: int,
 ):
     from lightning_utilities.core.rank_zero import rank_zero_info, rank_zero_only
     from inference.api import (
@@ -133,6 +138,7 @@ def main(
         mode="evaluate",
         cache_threshold=cache_threshold if cache_threshold > 0 else None,
         cache_fn_blocks=cache_fn_blocks,
+        cache_taylor_derivatives=cache_taylor_derivatives,
     )
     logging.success("Evaluation completed.", callback=rank_zero_info)
 
